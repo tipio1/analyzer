@@ -104,6 +104,7 @@ class Functions:
         """
         try:
             print(Color.GREEN + "[+] Duggy Tuxy report:" + Color.END)
+            global DUGGY_COUNT
             count = 0
             url = "https://raw.githubusercontent.com/duggytuxy/malicious_ip_addresses/main/botnets_zombies_scanner_spam_ips.txt"
             page = urllib.request.urlopen(url,timeout=5).read()
@@ -115,7 +116,6 @@ class Functions:
             else:
                 count == count
                 print('[+]', DOMAIN_NAME_TO_IP, "Not found in the Duggy Tuxy's list")
-            global DUGGY_COUNT
             DUGGY_COUNT = count
         except Exception:
             print(Color.RED + "[!] Error with Duggy Tuxy's list, check repo" + Color.END)
@@ -139,6 +139,7 @@ class Functions:
     def criminalIP():
         try:
             print(Color.GREEN + "[+] Criminal IP report:" + Color.END)
+            global CRIMINALIP_COUNTS
             url = (f"https://api.criminalip.io/v1/feature/ip/malicious-info?ip={DOMAIN_NAME_TO_IP}")
             payload = {}
             with open(KEY_FILE, "r") as file:
@@ -147,9 +148,6 @@ class Functions:
                 response = requests.request("GET", url, headers=headers, data=payload)
                 result = response.json()
                 count = 0
-                portsCount = 0
-                vulnCount = 0
-                categoryCount =0
                 if result['is_malicious'] == True:
                     count += 1
                     print("[+] Malicious IP:", result['is_malicious'])
@@ -160,7 +158,6 @@ class Functions:
                     if result['current_opened_port']['count'] != 0:
                         print('[+] Count of opened ports:', result['current_opened_port']['count'])
                     for key in range(len(result['current_opened_port']['data'])):
-                        portsCount += 1
                         print('\t-',
                             result['current_opened_port']['data'][key]['socket_type'],
                             result['current_opened_port']['data'][key]['port'],
@@ -170,7 +167,6 @@ class Functions:
                             result['current_opened_port']['data'][key]['has_vulnerability']
                         )
                     if result['vulnerability']['count'] != 0:
-                        vulnCount += 1
                         print('[+] Count of vulnerabilities founded:',result['vulnerability']['count'])
                         charToRemove = ["{", "}", "[", "]"]
                         stringToDisplay = str(result['vulnerability']['data'][key]['ports']).replace("'", '')
@@ -186,24 +182,17 @@ class Functions:
                                 result['vulnerability']['data'][key]['product_version'],
                                 result['vulnerability']['data'][key]['product_vendor']
                             )
-                    else:
-                        vulnCount == vulnCount
                     if result['ip_category']['count'] != 0:
                         print('[+] count of IP category: ', result['ip_category']['count'])
                         for key in range(len(result['ip_category']['data'])):
-                            categoryCount += 1
                             print('\t- IP category:',
                                 result['ip_category']['data'][key]['type'],'\n\t\t+ detected source =>',
                                 result['ip_category']['data'][key]['detect_source']
                             )
-                    else:
-                        categoryCount == categoryCount
                 else:
                     count == count
-                    portsCount == portsCount
                     print(DOMAIN_NAME_TO_IP, 'Not found in CriminalIP.io')
-            global CRIMINALIP_COUNTS
-            CRIMINALIP_COUNTS = [count, portsCount, result['vulnerability']['count'], categoryCount]  # optimise without calculation, take result[][]
+            CRIMINALIP_COUNTS = [count, result['current_opened_port']['count'], result['vulnerability']['count'], result['ip_category']['count']]
         except Exception:
             print(Color.RED + "[!] Error with CriminalIP config, check it" + Color.END)
         
@@ -226,6 +215,7 @@ class Functions:
     def abuseIPDB():
         try:
             print(Color.GREEN + "[+] AbuseIPDB report:" + Color.END)
+            global ABUSEIPDB_CONFIDENCE
             with open(KEY_FILE, "r") as file:
                 configFile = json.load(file)
                 url = "https://api.abuseipdb.com/api/v2/check"
@@ -245,7 +235,6 @@ class Functions:
                         '\n\t- Distinct users:', result['data']["numDistinctUsers"], 
                         '\n\t- Last report date:', result['data']["lastReportedAt"]
                     )
-            global ABUSEIPDB_CONFIDENCE
             ABUSEIPDB_CONFIDENCE = [result['data']['totalReports'], result['data']["abuseConfidenceScore"]]
         except Exception:
             print(Color.RED + "[!] Error with AbuseIPDB config, check it" + Color.END)
@@ -269,6 +258,7 @@ class Functions:
     def otx():
         try:
             print(Color.GREEN + "[+] OTX report:" + Color.END)
+            global OTX_COUNT
             with open(KEY_FILE, "r") as file:
                 configFile = json.load(file)
                 otx = OTXv2(configFile['api']['otx'])
@@ -277,7 +267,6 @@ class Functions:
                 print("[+] Reputation:", response['general']['reputation'])
                 #print("indicators: ", response['general']['base_indicator'])
                 print("[+] Count of pulses reported:", response['general']['pulse_info']['count'])
-                global OTX_COUNT
                 OTX_COUNT = response['general']['pulse_info']['count']
                 if response['general']['pulse_info']['count'] != 0:
                     for key in range(len(response['general']['pulse_info']['pulses'])):
@@ -321,26 +310,10 @@ class Functions:
         # https://github.com/stamparm/ipsum/tree/master
 
 
-class Reputation:
+class Count:
     """_summary_
     Sends constants to summary class
     """
     @staticmethod
-    def vtCount():
-        return VT_COUNT    
-    
-    @staticmethod
-    def dtCount():
-        return DUGGY_COUNT
-    
-    @staticmethod
-    def ciCount():
-        return CRIMINALIP_COUNTS 
-    
-    @staticmethod
-    def abCount():
-        return ABUSEIPDB_CONFIDENCE
-
-    @staticmethod
-    def otCount():
-        return OTX_COUNT
+    def count():
+        return [VT_COUNT, DUGGY_COUNT, CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]    

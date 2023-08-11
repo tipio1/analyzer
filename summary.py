@@ -9,56 +9,76 @@ from utils import *
 # import sys
 
 
-
 class Summary:
     """_summary_
-    Parse functions, calculate reputation score and returns results
+    Parse functions, calculate note score and returns results
             print('[!] Agressivity:',agressivity)
             print('[!] Malicious:',malicious)
-            print('[!] Suspect:',suspect)
+            print('[!] reported:',reported)
+            counts = [ciCount, ciPortCount, ciVulCount, ciCatCount]
+            print(
+                "\t-",vt,
+                "\n\t-",vtTotalScanners,
+                "\n\t-",dt,
+                "\n\t-",ciCount,
+                "\n\t-",ciPortCount,
+                "\n\t-",ciVulCount,
+                "\n\t-",ciCatCount,
+                "\n\t-",abReports,
+                "\n\t-",abCnfidence,
+                "\n\t-",ot
+            )
+            print(
+                "\t-",vtAverage,
+                "\n\t-",agressivity,
+                "\n\t-",malicious,
+                "\n\t-",reported
+            )
     """
     @staticmethod
     def summary():
         try:
-            vt = Reputation.vtCount()[0]
-            vtTotalScanners = Reputation.vtCount()[1]
-            dt = Reputation.dtCount()
-            ciCount = Reputation.ciCount()[0]
-            ciPortCount = Reputation.ciCount()[1]
-            ciVulCount = Reputation.ciCount()[2]
-            ciCatCount = Reputation.ciCount()[3]
-            counts = [ciCount, ciPortCount, ciVulCount, ciCatCount]
-            abReports = Reputation.abCount()[0]
-            abCnfidence = Reputation.abCount()[1]
-            ot = Reputation.otCount()
+            vt = Count.count()[0][0]
+            vtTotalScanners = Count.count()[0][1]
+            dt = Count.count()[1]
+            ciCount = Count.count()[2][0]
+            ciPortCount = Count.count()[2][1]
+            ciVulCount = Count.count()[2][2]
+            ciCatCount = Count.count()[2][3]
+            abReports = Count.count()[3][0]
+            abCnfidence = Count.count()[3][1]
+            ot = Count.count()[4]
 
+            vtAverage = round((vt/vtTotalScanners), 2)
+            agressivity = 0
+            malicious = 0
+            reported = 0
+            
             if (vt == 0):
                 print('[+] Clean on Virus Total')
-                print("[+] IP or Domain not reported")
-                exit(0)
             else:
-                average = vt/vtTotalScanners
                 print("[!] Detected on Virus Total")
                 print('\t- Count of detections:', vt,
                       '\n\t- Count of Antivirus scanned:', vtTotalScanners,
-                      '\n\t- Virus Total Average:',round(average, 2)
+                      '\n\t- Virus Total Average:',vtAverage
                     )
-            if dt == 0:
+            print("--------------------------------------------------------------------------------------------------------")
+            if (dt == 0):  # integrate other blacklists to adjust the result
                 print("[+] Not in Duggy Txy's list")
+                agressivity = 2
             else:
                 print("[!] In Duggy Txy's list")
-            if (dt == 0, average <= 0.09, ot >= 5):
-                agressivity = 4
-            elif (dt == 0, average > 0.09, ot >= 10):
-                agressivity = 6
-            elif (dt == 1, average > 0.09, ot >= 10):
-                agressivity = 8
-            elif (dt == 1, average > 0.09, ot >= 10):
-                agressivity = 10
+                if (dt == 1 and vt <= 8):
+                    agressivity = 4
+                if (dt == 1 and vt >= 8 and vt <= 15):
+                    agressivity = 6
+                if (dt == 1 and vt >= 16 and vt <= 25):
+                    agressivity = 8
+                if (dt == 1 and vt >= 26):
+                    agressivity = 10
             print("--------------------------------------------------------------------------------------------------------")
-            # print(counts)
             if ciCount == 0:
-                print('[+] Not suspected by Criminal IP')
+                print('[+] Not reporteded by Criminal IP')
             else:
                 print("[!] Reported malicious on Criminal IP")
                 print(
@@ -66,35 +86,45 @@ class Summary:
                       "\n\t- Count of vulnerability founded:",ciVulCount,
                       "\n\t- Count of IP category:",ciCatCount
                     )
-            if (agressivity <= 6, average <= 0.09, ciCount == 0):
-                malicious = 5
-            elif (agressivity >= 7, average > 0.09, ciCount == 1):
-                malicious = 10
+                if (ciCount == 1 and agressivity <= 4):
+                    malicious = 4
+                if (ciCount == 1 and agressivity > 4 and agressivity <= 6):
+                    malicious = 6
+                if (ciCount == 1 and agressivity > 6 and agressivity <= 8):
+                    malicious = 8
+                if (ciCount == 1 and agressivity > 8):
+                    malicious = 10
             print("--------------------------------------------------------------------------------------------------------")
-            if abReports == 0:
+            if abReports == 0:  # integrate otx to adjust the result
                 print("[+] Not found on AbuseIPDB")
             else:
                 print("[!] Reported on AbuseIPDB")
                 print(
                     "\t- Confidence index:",abCnfidence, '%',
-                    "\n\t- Count of reports:",abReports)     
-            if (malicious > 6, abCnfidence > 50, average >= 0.09, agressivity <= 6):
-                suspect = 8
-            elif (malicious > 6, abCnfidence > 60, average >= 0.09, agressivity >= 6):
-                suspect = 10
+                    "\n\t- Count of reports:",abReports)
+                if (abReports <= 50 and agressivity < 4 and malicious <= 4):
+                    reported = 4
+                if (abReports >= 50 and agressivity <= 6 and malicious <= 6):
+                    reported = 6
+                if (abReports >= 50 and agressivity <= 8 and malicious <= 8):
+                    reported = 8     
+                if (abReports >= 50 and agressivity > 8 and malicious > 8):
+                    reported = 10
             print("--------------------------------------------------------------------------------------------------------")
             if ot == 0:
                 print("[+] No pulses reported on OTX")
             else:
                 print("[!] Count of pulses reported on OTX:",ot)
             print("--------------------------------------------------------------------------------------------------------")
-            note = (agressivity+malicious+suspect)/3
+            note = (agressivity+malicious+reported)/3
             print("[!] General note:", round(note, 2))
-            if round(note, 2) <= 6:
-                print('[!] Medium IP')
-            elif round(note, 2) >= 7:
-                print('[!] High IP')
-            elif round(note, 2) > 8:
-                print('[!] Critical IP')
+            if round(note, 2) <= 2:
+                print(Color.GREEN + '[!] Low IP' + Color.END)
+            if (round(note, 2) > 2 and round(note, 2) < 6):
+                print(Color.ORANGE + '[!] Medium IP' + Color.END)
+            if (round(note, 2) >= 6 and round(note, 2) < 8):
+                print(Color.RED + '[!] High IP' + Color.END)
+            if round(note, 2) >= 8:
+                print(Color.RED + '[!] Critical IP' + Color.END)
         except Exception:
             print('error')
