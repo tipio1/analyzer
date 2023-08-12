@@ -38,21 +38,31 @@ class Summary:
     @staticmethod
     def summary():
         try:
-            vt = Count.count()[0][0]
-            vtTotalScanners = Count.count()[0][1]
-            dt = Count.count()[1]
-            ciCount = Count.count()[2][0]
-            ciPortCount = Count.count()[2][1]
-            ciVulCount = Count.count()[2][2]
-            ciCatCount = Count.count()[2][3]
-            abReports = Count.count()[3][0]
-            abCnfidence = Count.count()[3][1]
-            ot = Count.count()[4]
+            country = Count.count()[0][0]
+            prx = Count.count()[0][1]
+            vt = Count.count()[1][0]
+            vtTotalScanners = Count.count()[1][1]
+            dt = Count.count()[2]
+            ciCount = Count.count()[3][0]
+            ciPortCount = Count.count()[3][1]
+            ciVulCount = Count.count()[3][2]
+            ciCatCount = Count.count()[3][3]
+            abReports = Count.count()[4][0]
+            abCnfidence = Count.count()[4][1]
+            ot = Count.count()[5]
+            
+            if vt == 0 and vtTotalScanners == 0:
+                vtAverage = 0
+            else:
+                vtAverage = round((vt/vtTotalScanners), 2)
 
-            vtAverage = round((vt/vtTotalScanners), 2)
             agressivity = 0
             malicious = 0
             reported = 0
+
+            print('[+] Country: ',str(country))
+            print('[+] Categorized as proxy: ',str(prx))
+            print("--------------------------------------------------------------------------------------------------------")
             
             if (vt == 0):
                 print('[+] Clean on Virus Total')
@@ -63,6 +73,7 @@ class Summary:
                       '\n\t- Virus Total Average:',vtAverage
                     )
             print("--------------------------------------------------------------------------------------------------------")
+            
             if (dt == 0):  # integrate other blacklists to adjust the result
                 print("[+] Not in Duggy Txy's list")
                 agressivity = 2
@@ -77,6 +88,7 @@ class Summary:
                 if (dt == 1 and vt >= 26):
                     agressivity = 10
             print("--------------------------------------------------------------------------------------------------------")
+            
             if ciCount == 0:
                 print('[+] Not reporteded by Criminal IP')
             else:
@@ -95,6 +107,7 @@ class Summary:
                 if (ciCount == 1 and agressivity > 8):
                     malicious = 10
             print("--------------------------------------------------------------------------------------------------------")
+            
             if abReports == 0:  # integrate otx to adjust the result
                 print("[+] Not found on AbuseIPDB")
             else:
@@ -111,11 +124,13 @@ class Summary:
                 if (abReports >= 50 and agressivity > 8 and malicious > 8):
                     reported = 10
             print("--------------------------------------------------------------------------------------------------------")
+            
             if ot == 0:
                 print("[+] No pulses reported on OTX")
             else:
                 print("[!] Count of pulses reported on OTX:",ot)
             print("--------------------------------------------------------------------------------------------------------")
+            
             note = (agressivity+malicious+reported)/3
             print("[!] General note:", round(note, 2))
             if round(note, 2) <= 2:
@@ -126,5 +141,6 @@ class Summary:
                 print(Color.RED + '[!] High IP' + Color.END)
             if round(note, 2) >= 8:
                 print(Color.RED + '[!] Critical IP' + Color.END)
+        
         except Exception:
             print('error')

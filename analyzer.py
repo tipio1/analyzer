@@ -20,26 +20,48 @@ class Functions:
     @staticmethod
     def whois():
         """_summary_
-        Check Whois and return the results in a dedicated file in the reports directory.
-        """
-        print(Color.GREEN + "[+] whois report: " + Color.END)
-        (
-            os.system("whois " + IP + " | grep -E 'Registrar WHOIS Server|Name Server|Creation Date|Registrar URL|Registrar Registration Expiration Date|Registrant Organization|Registrant Country|Name Server' | sed 's/^\ *//g' | tr '[A-Z]' '[a-z]' | sort -u")
-            or
-            os.system("whois " + IP + " | grep -E 'netname|country|person|route' | sed 's/^\ *//g' | tr '[A-Z]' '[a-z]' | sort -u")
-            or
-            os.system("whois " + IP + " | grep -E 'NetName|Organization|Country|RegDate' | sed 's/^\ *//g' | tr '[A-Z]' '[a-z]' | sort -u")
-        )
-        """ Bug with opening and writing to file (Agust 23)
-        with open('reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
-            (
-                os.system("whois " + IP + " | grep -E 'Registrar WHOIS Server|Name Server|Creation Date|Registrar URL|Registrar Registration Expiration Date|Registrant Organization|Registrant Country|Name Server' | sed 's/^\ *//g' | tr '[A-Z]' '[a-z]' | sort -u > " + "reports/" + TODAY + "/" + str(DOMAIN_NAME_TO_IP) + ".txt")
-                or 
-                os.system("whois " + IP + " | grep -E 'netname|country|person|route' | sed 's/^\ *//g' | tr '[A-Z]' '[a-z]' | sort -u > " + "reports/" + TODAY + "/" + str(DOMAIN_NAME_TO_IP) + ".txt")
+        Check ip2location and return the results in a dedicated file in the reports directory.
+            whois cmd sup:
                 or
-                os.system("whois " + IP + " | grep -E 'NetName|Organization|Country|RegDate' | sed 's/^\ *//g' | tr '[A-Z]' '[a-z]' | sort -u > " + "reports/" + TODAY + "/" + str(DOMAIN_NAME_TO_IP) + ".txt")
-            )
+                os.system("whois " + IP + " | grep -A15 netname | grep -E 'NetName|Organization|Country|RegDate' | sed 's/^\ *//g' | tr '[A-Z]' '[a-z]' | sort -u > " + f"analyzer_reports/{DOMAIN_NAME_TO_IP}_whois.txt")
         """
+        print(Color.GREEN + "[+] ip2location report: " + Color.END)
+        global WHOIS
+        
+        with open(KEY_FILE, 'r') as file:
+            configFile = json.load(file)
+            key = configFile['api']['ip2location']
+            url = (f"https://api.ip2location.io/?key={key}&ip={DOMAIN_NAME_TO_IP}&format=json")
+            response = requests.request("GET", url)
+            result = response.json()
+            print('\t- Country code:',result['country_code'],
+                  '\n\t- Time zone:', result['time_zone'],
+                  '\n\t- Categorized as proxy:', result['is_proxy']
+                  )
+
+        print(Color.ORANGE + "[+] Potential more infos stored in the report file (whois)" + Color.END)
+        char = ("a" or "b" or "c" or "d" or "e" or "f" or "g" or "h" or "i" or "j" or "k" or "l" or "m" or "n" or "o" or "p" or "q" or "r" or "s" or "t" or "u" or "v" or "w" or "x" or "y" or "z")
+        if char in str(INPUT):
+            os.system("whois " + IP + " | grep -E 'Registrar WHOIS Server|Name Server|Creation Date|Registrar URL|Registrar Registration Expiration Date|Registrant Organization|Registrant Country|Name Server' | sed 's/^\ *//g' | tr '[A-Z]' '[a-z]' | sort -u > " + f"analyzer_reports/{DOMAIN_NAME_TO_IP}_whois.txt")
+        else:
+            os.system("whois " + IP + " | grep -A15 netname | grep -E 'netname|country|person|route|last-modified' | sed -e 's/^\ *//g' -e 's/\  */ /g' | tr '[A-Z]' '[a-z]' | sort -u > " + f"analyzer_reports/{DOMAIN_NAME_TO_IP}_whois.txt")
+
+        isProxy = str(result['is_proxy'])
+        WHOIS = [result['country_code'], isProxy]
+
+        with open('analyzer_reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
+            fileReport.write("\n --------------------------------- ")
+            fileReport.write("\n ip2location report:")
+            fileReport.write("\n --------------------------------- \n")
+            fileReport.write('\t- Country code: ')
+            fileReport.write(result['country_code'])
+            fileReport.write('\n\t- Time zone: ')
+            fileReport.write(result['time_zone'])
+            fileReport.write('\n\t- Categorized as proxy: ')
+            fileReport.write(isProxy)
+            with open((f"analyzer_reports/{DOMAIN_NAME_TO_IP}_whois.txt"), 'r') as whoisFile:
+                fileReport.write("\n whois report:\n")
+                fileReport.write(str(whoisFile.read()))
 
 
     @staticmethod
@@ -50,24 +72,29 @@ class Functions:
         try:
             print(Color.GREEN + "[+] VirusTotal report:" + Color.END)
             global VT_COUNT
+            
             with open('analyzer_reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
                 fileReport.write("\n --------------------------------- ")
                 fileReport.write("\n VirusTotal report:")
                 fileReport.write("\n --------------------------------- \n")
+
                 with open(KEY_FILE, "r") as file:
                     configFile = json.load(file)
                     url = 'https://www.virustotal.com/vtapi/v2/url/report'
                     params = {'apikey': configFile['api']['virus total'], 'resource': DOMAIN_NAME_TO_IP}
                     response = requests.get(url, params=params)
-                    if response.status_code == 200:
-                        count = 0
-                        result = response.json()
+                    result = response.json()
+                    count = 0
+                    
+                    if 'Resource does not exist in the dataset' in str(result):
+                        print('[!] Message:',result['verbose_msg'])
+                        VT_COUNT = [0, 0]
+                    elif response.status_code == 200:
                         fileReport.write(result['permalink'])
-                        fileReport.write("\n ---------------------------------")
-                        print("[+] The VirusTotal report link is stored in the previously created file")
+                        fileReport.write("\n --------------------------------- \n")
                         if result['positives'] == 0:
+                            print("[+] The VirusTotal report link is stored in the previously created file")
                             print("[!] No positives results found in " + str(result['total']) + " AV scanned")
-                            fileReport.write(result['permalink'])
                             fileReport.write('[!] Clean on Virus Total')
                             fileReport.close()
                             VT_COUNT = [count, result['total']]
@@ -93,6 +120,7 @@ class Functions:
                             fileReport.write(str(count))
                             fileReport.close()
                             VT_COUNT = [count, result['total']]
+
         except Exception:
             print(Color.RED + "[!] Error in the Virus Total conf, check it" + Color.END)
 
@@ -110,13 +138,16 @@ class Functions:
             page = urllib.request.urlopen(url,timeout=5).read()
             soup = bs(page, 'html.parser')  # or 'lxml'
             text = soup.get_text()
+
             if DOMAIN_NAME_TO_IP in str(text):
                 count += 1
                 print('[!]', DOMAIN_NAME_TO_IP, 'Found in the list. Possible active Botnets/Zombies/Scanners in European Cyber Space')
             else:
                 count == count
                 print('[+]', DOMAIN_NAME_TO_IP, "Not found in the Duggy Tuxy's list")
+            
             DUGGY_COUNT = count
+        
         except Exception:
             print(Color.RED + "[!] Error with Duggy Tuxy's list, check repo" + Color.END)
         
@@ -142,12 +173,14 @@ class Functions:
             global CRIMINALIP_COUNTS
             url = (f"https://api.criminalip.io/v1/feature/ip/malicious-info?ip={DOMAIN_NAME_TO_IP}")
             payload = {}
+            
             with open(KEY_FILE, "r") as file:
                 configFile = json.load(file)
                 headers = {'x-api-key': configFile['api']['criminal ip']}
                 response = requests.request("GET", url, headers=headers, data=payload)
                 result = response.json()
                 count = 0
+                
                 if result['is_malicious'] == True:
                     count += 1
                     print("[+] Malicious IP:", result['is_malicious'])
@@ -192,7 +225,9 @@ class Functions:
                 else:
                     count == count
                     print(DOMAIN_NAME_TO_IP, 'Not found in CriminalIP.io')
+            
             CRIMINALIP_COUNTS = [count, result['current_opened_port']['count'], result['vulnerability']['count'], result['ip_category']['count']]
+        
         except Exception:
             print(Color.RED + "[!] Error with CriminalIP config, check it" + Color.END)
         
@@ -216,12 +251,14 @@ class Functions:
         try:
             print(Color.GREEN + "[+] AbuseIPDB report:" + Color.END)
             global ABUSEIPDB_CONFIDENCE
+            
             with open(KEY_FILE, "r") as file:
                 configFile = json.load(file)
                 url = "https://api.abuseipdb.com/api/v2/check"
                 querystring = {'ipAddress': DOMAIN_NAME_TO_IP, 'maxAgeInDays': '90'}
                 headers = {'Accept': 'applications/json', 'key': configFile['api']['abuseipdb']}
                 response = requests.request(method='GET', url=url, headers=headers, params=querystring)
+                
                 if response.status_code == 200:
                     result = response.json()
                     print('[+] Count of reports:', result['data']['totalReports'])
@@ -235,7 +272,9 @@ class Functions:
                         '\n\t- Distinct users:', result['data']["numDistinctUsers"], 
                         '\n\t- Last report date:', result['data']["lastReportedAt"]
                     )
+            
             ABUSEIPDB_CONFIDENCE = [result['data']['totalReports'], result['data']["abuseConfidenceScore"]]
+        
         except Exception:
             print(Color.RED + "[!] Error with AbuseIPDB config, check it" + Color.END)
 
@@ -259,6 +298,7 @@ class Functions:
         try:
             print(Color.GREEN + "[+] OTX report:" + Color.END)
             global OTX_COUNT
+            
             with open(KEY_FILE, "r") as file:
                 configFile = json.load(file)
                 otx = OTXv2(configFile['api']['otx'])
@@ -268,6 +308,7 @@ class Functions:
                 #print("indicators: ", response['general']['base_indicator'])
                 print("[+] Count of pulses reported:", response['general']['pulse_info']['count'])
                 OTX_COUNT = response['general']['pulse_info']['count']
+                
                 if response['general']['pulse_info']['count'] != 0:
                     for key in range(len(response['general']['pulse_info']['pulses'])):
                         whileCount = response['general']['pulse_info']['count']
@@ -286,6 +327,7 @@ class Functions:
                                 if whileCount == 5:
                                     break
                                 whileCount = whileCount + 1
+        
         except Exception:
             print('Not found in otx alien vault!')
 
@@ -316,4 +358,4 @@ class Count:
     """
     @staticmethod
     def count():
-        return [VT_COUNT, DUGGY_COUNT, CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]    
+        return [WHOIS, VT_COUNT, DUGGY_COUNT, CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]    
