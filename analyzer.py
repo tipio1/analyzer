@@ -196,7 +196,7 @@ class Functions:
             else:
                 count == count
                 blacklists = 0
-                print('[+]', DOMAIN_NAME_TO_IP, "Not found in the IPsum's list")
+                print('[+]', DOMAIN_NAME_TO_IP, "Not found in the IPsum's blacklists")
             
             IPSUM_COUNT = [count, int(blacklists)]
 
