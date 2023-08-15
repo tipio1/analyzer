@@ -34,6 +34,10 @@ if __name__ == '__main__':
         print(Color.BLUE + "[+] Check Duggy Tuxy's list" + Color.END)
         print("--------------------------------------------------------------------------------------------------------")
         Functions.scrapDuggyTuxyRepo()
+
+        print(Color.BLUE + "[+] Check IPsum's blacklists" + Color.END)
+        print("--------------------------------------------------------------------------------------------------------")
+        Functions.ipsum()
         
         print(Color.BLUE + "[+] Check CriminalIP.io" + Color.END)
         print("--------------------------------------------------------------------------------------------------------")

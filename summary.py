@@ -43,13 +43,15 @@ class Summary:
             vt = Count.count()[1][0]
             vtTotalScanners = Count.count()[1][1]
             dt = Count.count()[2]
-            ciCount = Count.count()[3][0]
-            ciPortCount = Count.count()[3][1]
-            ciVulCount = Count.count()[3][2]
-            ciCatCount = Count.count()[3][3]
-            abReports = Count.count()[4][0]
-            abCnfidence = Count.count()[4][1]
-            ot = Count.count()[5]
+            ipsum = Count.count()[3][0]
+            ipsumCount = Count.count()[3][1]
+            ciCount = Count.count()[4][0]
+            ciPortCount = Count.count()[4][1]
+            ciVulCount = Count.count()[4][2]
+            ciCatCount = Count.count()[4][3]
+            abReports = Count.count()[5][0]
+            abCnfidence = Count.count()[5][1]
+            ot = Count.count()[6]
             
             if vt == 0 and vtTotalScanners == 0:
                 vtAverage = 0
@@ -75,10 +77,13 @@ class Summary:
             print("--------------------------------------------------------------------------------------------------------")
             
             if (dt == 0):  # integrate other blacklists to adjust the result
-                print("[+] Not in Duggy Txy's list")
+                print("[+] Not in Duggy Tuxy's list")
+                agressivity = 2
+            if (ipsum == 0):
+                print("[+] Not in IPsum's blacklists")
                 agressivity = 2
             else:
-                print("[!] In Duggy Txy's list")
+                print("[!] found in Duggy Txy's or IPsum lists")
                 if (dt == 1 and vt <= 8):
                     agressivity = 4
                 if (dt == 1 and vt >= 8 and vt <= 15):
@@ -87,6 +92,23 @@ class Summary:
                     agressivity = 8
                 if (dt == 1 and vt >= 26):
                     agressivity = 10
+                if (ipsum == 1 and ipsumCount <= 3):
+                    agressivity = 4
+                if (ipsum == 1 and vt >= 8 and ipsumCount > 3 and  ipsumCount < 5):
+                    agressivity = 6
+                if (ipsum == 1 and vt >= 16 and ipsumCount > 5 and  ipsumCount < 7):
+                    agressivity = 8
+                if (ipsum == 1 and ipsumCount > 7):
+                    agressivity = 10
+                if (dt == 1 and ipsum == 1 and vt <= 3 and ipsumCount < 2):
+                    agressivity = 4
+                if (dt == 1 and ipsum == 1 and vt > 4 and ipsumCount > 2 and ipsumCount < 4):
+                    agressivity = 6
+                if (dt == 1 and ipsum == 1 and vt > 6 and ipsumCount > 4 and ipsumCount < 8):
+                    agressivity = 8
+                if (dt == 1 and ipsum == 1 and vt > 6 and ipsumCount >= 8):
+                    agressivity = 10
+                print('[!] Agressivity:', agressivity)
             print("--------------------------------------------------------------------------------------------------------")
             
             if ciCount == 0:
@@ -106,6 +128,7 @@ class Summary:
                     malicious = 8
                 if (ciCount == 1 and agressivity > 8):
                     malicious = 10
+                print('[!] Malicious:', malicious)
             print("--------------------------------------------------------------------------------------------------------")
             
             if abReports == 0:  # integrate otx to adjust the result
@@ -123,6 +146,7 @@ class Summary:
                     reported = 8     
                 if (abReports >= 50 and agressivity > 8 and malicious > 8):
                     reported = 10
+                print('[!] Reported:', reported)
             print("--------------------------------------------------------------------------------------------------------")
             
             if ot == 0:

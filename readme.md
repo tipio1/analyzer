@@ -8,7 +8,8 @@
 ## In run:
 - VirusTotal
 - AbuseIPDB 
-- [Duggy Tuxy blacklist](https://github.com/duggytuxy/malicious_ip_addresses/blob/main/botnets_zombies_scanner_spam_ips.txt) 
+- [Duggy Tuxy blacklist](https://github.com/duggytuxy/malicious_ip_addresses)
+- [IPsum](https://github.com/stamparm/ipsum)
 - CriminalIP
 - OTX/AlienVault 
 

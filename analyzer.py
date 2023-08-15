@@ -36,7 +36,7 @@ class Functions:
             result = response.json()
             print('\t- Country code:',result['country_code'],
                   '\n\t- Time zone:', result['time_zone'],
-                  '\n\t- Categorized as proxy:', result['is_proxy']
+                  '\n\t- Categorized as public proxy:', result['is_proxy']
                   )
 
         print(Color.ORANGE + "[+] Potential more infos stored in the report file (whois)" + Color.END)
@@ -60,7 +60,9 @@ class Functions:
             fileReport.write('\n\t- Categorized as proxy: ')
             fileReport.write(isProxy)
             with open((f"analyzer_reports/{DOMAIN_NAME_TO_IP}_whois.txt"), 'r') as whoisFile:
-                fileReport.write("\n whois report:\n")
+                fileReport.write("\n --------------------------------- ")
+                fileReport.write("\n Whois report:")
+                fileReport.write("\n --------------------------------- \n")
                 fileReport.write(str(whoisFile.read()))
 
 
@@ -167,6 +169,56 @@ class Functions:
 
 
     @staticmethod
+    def ipsum():
+        """
+        IPsum is a threat intelligence feed based on 30+ different publicly available lists of suspicious and/or malicious IP addresses like:
+            abuseipdb, alienvault, atmos, badips, bitcoinnodes, blocklist, botscout, cobaltstrike, malwaredomains, proxylists, ransomwaretrackerurl, talosintelligence, torproject, etc.
+        """
+        try:
+            print(Color.GREEN + "[+] IPsum report:" + Color.END)
+            global IPSUM_COUNT
+            count = 0
+            url = "https://raw.githubusercontent.com/stamparm/ipsum/master/ipsum.txt"
+            page = urllib.request.urlopen(url,timeout=5).read()
+            soup = bs(page, 'html.parser')  # or 'lxml'
+            text = soup.get_text()
+
+            if DOMAIN_NAME_TO_IP in str(text):
+                count += 1
+                print('[!]', DOMAIN_NAME_TO_IP, 'Found in the list.')
+                os.system(f'curl --compressed https://raw.githubusercontent.com/stamparm/ipsum/master/ipsum.txt 2>/dev/null | grep -v "#" | grep {DOMAIN_NAME_TO_IP} | cut -f 2 > out.txt')
+                with open('out.txt', 'r') as blacklisted:
+                    blacklists = blacklisted.read()
+                    if int(blacklists) != 0:
+                        print(f'[!] {DOMAIN_NAME_TO_IP} founded in:', blacklists,'blacklists')
+                        blacklisted.close()
+                        os.system('rm -rf out.txt')
+            else:
+                count == count
+                blacklists = 0
+                print('[+]', DOMAIN_NAME_TO_IP, "Not found in the IPsum's list")
+            
+            IPSUM_COUNT = [count, int(blacklists)]
+
+        except Exception:
+            print(Color.RED + "[!] Error with IPsum's blacklists, check repo" + Color.END)
+
+        with open('analyzer_reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
+            fileReport.write("\n --------------------------------- ")
+            fileReport.write("\n IPsum report:")
+            fileReport.write("\n --------------------------------- \n")
+            if count != 0:
+                fileReport.write('[!] ')
+                fileReport.write(DOMAIN_NAME_TO_IP)
+                fileReport.write(' Found in the list.')
+            if count == 0:
+                fileReport.write('[+] ')
+                fileReport.write(DOMAIN_NAME_TO_IP)
+                fileReport.write(" Not found in the IPsum's blacklists")
+                fileReport.close()
+
+
+    @staticmethod
     def criminalIP():
         try:
             print(Color.GREEN + "[+] Criminal IP report:" + Color.END)
@@ -255,11 +307,9 @@ class Functions:
 
                     if result['ip_category']['count'] != 0:
                         print('[+] count of IP category: ', result['ip_category']['count'])
+                        print('[+] IP category:')
                         for key in range(len(result['ip_category']['data'])):
-                            print('\t- IP category:',
-                                result['ip_category']['data'][key]['type'],'\n\t\t+ detected source =>',
-                                result['ip_category']['data'][key]['detect_source']
-                            )
+                            print('\t-', result['ip_category']['data'][key]['type'])
 
                 else:
                     count == count
@@ -368,26 +418,29 @@ class Functions:
         
         except Exception:
             print('Not found in otx alien vault!')
-
-        with open('analyzer_reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
-            fileReport.write("\n --------------------------------- ")
-            fileReport.write("\n OTX report:")
-            fileReport.write("\n --------------------------------- \n")
-            if response['general']['pulse_info']['count'] != 0:
-                fileReport.write('[!] ')
-                fileReport.write(DOMAIN_NAME_TO_IP)
-                fileReport.write(' Is reported on OTX')
-            if response['general']['pulse_info']['count'] == 0:
-                fileReport.write('[+] ')
-                fileReport.write(DOMAIN_NAME_TO_IP)
-                fileReport.write(" Not reported on OTX")
-            fileReport.close()
+        
+        try:
+            with open('analyzer_reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
+                fileReport.write("\n --------------------------------- ")
+                fileReport.write("\n OTX report:")
+                fileReport.write("\n --------------------------------- \n")
+                if response['general']['pulse_info']['count'] != 0:
+                    fileReport.write('[!] ')
+                    fileReport.write(DOMAIN_NAME_TO_IP)
+                    fileReport.write(' Is reported on OTX')
+                if response['general']['pulse_info']['count'] == 0:
+                    fileReport.write('[+] ')
+                    fileReport.write(DOMAIN_NAME_TO_IP)
+                    fileReport.write(" Not reported on OTX")
+                fileReport.close()
+        except Exception:
+            fileReport.write('Not found in otx alien vault!')
 
 
     @staticmethod
     def othersScans():
         print('')
-        # https://github.com/stamparm/ipsum/tree/master
+        # https://threatbook.io/
 
 
 class Count:
@@ -396,4 +449,4 @@ class Count:
     """
     @staticmethod
     def count():
-        return [WHOIS, VT_COUNT, DUGGY_COUNT, CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]    
+        return [WHOIS, VT_COUNT, DUGGY_COUNT, IPSUM_COUNT,CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]    
