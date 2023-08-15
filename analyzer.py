@@ -450,6 +450,23 @@ class Functions:
         # https://www.itu.int/epublications/publication/D-STR-GCI.01-2021-HTM-E
 
 
+class Country:
+    @staticmethod
+    def country():
+        global COUNTRY_NAME
+        url = ('https://www.atlas-monde.net/codes-iso/')
+        response = requests.get(url)
+        soup = bs(response.text, 'html.parser')
+        page = soup.find_all('td')
+        countryNames = list()
+        for countryName in page:
+            countryNames.append(countryName.text)
+        target = WHOIS[0]
+        if target in countryNames:
+            index = countryNames.index(target)
+        
+        COUNTRY_NAME = countryNames[index-1]
+
 
 class Count:
     """_summary_
@@ -457,4 +474,5 @@ class Count:
     """
     @staticmethod
     def count():
-        return [WHOIS, VT_COUNT, DUGGY_COUNT, IPSUM_COUNT,CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]    
+        Country.country()
+        return [WHOIS, VT_COUNT, DUGGY_COUNT, IPSUM_COUNT,CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT, COUNTRY_NAME]

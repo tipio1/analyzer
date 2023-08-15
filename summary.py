@@ -38,6 +38,7 @@ class Summary:
     @staticmethod
     def summary():
         try:
+            countryName = Count.count()[7]
             country = Count.count()[0][0]
             prx = Count.count()[0][1]
             vt = Count.count()[1][0]
@@ -63,6 +64,7 @@ class Summary:
             reported = 0
 
             print('[+] Country: ',str(country))
+            print('[+] Country name (returned in French):', countryName)
             print('[+] Categorized as public proxy (ip2location): ',str(prx))
             print("--------------------------------------------------------------------------------------------------------")
             
