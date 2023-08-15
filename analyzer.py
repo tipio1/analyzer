@@ -178,6 +178,7 @@ class Functions:
             print(Color.GREEN + "[+] IPsum report:" + Color.END)
             global IPSUM_COUNT
             count = 0
+            blacklists = 0
             url = "https://raw.githubusercontent.com/stamparm/ipsum/master/ipsum.txt"
             page = urllib.request.urlopen(url,timeout=5).read()
             soup = bs(page, 'html.parser')  # or 'lxml'
@@ -190,12 +191,12 @@ class Functions:
                 with open('out.txt', 'r') as blacklisted:
                     blacklists = blacklisted.read()
                     if int(blacklists) != 0:
-                        print(f'[!] {DOMAIN_NAME_TO_IP} founded in:', blacklists,'blacklists')
+                        print(f'[!] {DOMAIN_NAME_TO_IP} founded in:', int(blacklists),'blacklists')
                         blacklisted.close()
                         os.system('rm -rf out.txt')
             else:
                 count == count
-                blacklists = 0
+                blacklists = blacklists
                 print('[+]', DOMAIN_NAME_TO_IP, "Not found in the IPsum's blacklists")
             
             IPSUM_COUNT = [count, int(blacklists)]
@@ -418,6 +419,7 @@ class Functions:
         
         except Exception:
             print('Not found in otx alien vault!')
+            OTX_COUNT = 0
         
         try:
             with open('analyzer_reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
@@ -434,13 +436,19 @@ class Functions:
                     fileReport.write(" Not reported on OTX")
                 fileReport.close()
         except Exception:
-            fileReport.write('Not found in otx alien vault!')
+            with open('analyzer_reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
+                fileReport.write('Not found in otx alien vault!')
+                fileReport.close()
+
 
 
     @staticmethod
     def othersScans():
         print('')
         # https://threatbook.io/
+        # https://www.atlas-monde.net/codes-iso/
+        # https://www.itu.int/epublications/publication/D-STR-GCI.01-2021-HTM-E
+
 
 
 class Count:

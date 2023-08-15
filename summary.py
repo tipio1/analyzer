@@ -63,7 +63,7 @@ class Summary:
             reported = 0
 
             print('[+] Country: ',str(country))
-            print('[+] Categorized as proxy: ',str(prx))
+            print('[+] Categorized as public proxy (ip2location): ',str(prx))
             print("--------------------------------------------------------------------------------------------------------")
             
             if (vt == 0):
@@ -71,8 +71,7 @@ class Summary:
             else:
                 print("[!] Detected on Virus Total")
                 print('\t- Count of detections:', vt,
-                      '\n\t- Count of Antivirus scanned:', vtTotalScanners,
-                      '\n\t- Virus Total Average:',vtAverage
+                      '\n\t- Count of Antivirus scanned:', vtTotalScanners
                     )
             print("--------------------------------------------------------------------------------------------------------")
             
@@ -83,7 +82,7 @@ class Summary:
                 print("[+] Not in IPsum's blacklists")
                 agressivity = 2
             else:
-                print("[!] found in Duggy Txy's or IPsum lists")
+                print("[!] Found in Duggy Tuxy and/or IPsum lists")
                 if (dt == 1 and vt <= 8):
                     agressivity = 4
                 if (dt == 1 and vt >= 8 and vt <= 15):
@@ -166,5 +165,5 @@ class Summary:
             if round(note, 2) >= 8:
                 print(Color.RED + '[!] Critical IP' + Color.END)
         
-        except Exception:
-            print('error')
+        except Exception as err:
+            print('error:', err)
