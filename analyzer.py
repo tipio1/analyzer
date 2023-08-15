@@ -188,33 +188,71 @@ class Functions:
                     print('[+] Remote access:', result['can_remote_access'])
                     print('[+] Remote port:', result['remote_port'])
                     print('[+] IDS:', result['ids'])
+
                     if result['current_opened_port']['count'] != 0:
                         print('[+] Count of opened ports:', result['current_opened_port']['count'])
-                    for key in range(len(result['current_opened_port']['data'])):
-                        print('\t-',
-                            result['current_opened_port']['data'][key]['socket_type'],
-                            result['current_opened_port']['data'][key]['port'],
-                            result['current_opened_port']['data'][key]['protocol'],
-                            result['current_opened_port']['data'][key]['product_name'],
-                            result['current_opened_port']['data'][key]['product_version'],
-                            result['current_opened_port']['data'][key]['has_vulnerability']
-                        )
+                        portsCount = 0
+                        for key in range(len(result['current_opened_port']['data'])):
+                            if result['current_opened_port']['count'] > 10:
+                                if result['current_opened_port']['data'][key]['has_vulnerability'] == True:
+                                    print('\t-',
+                                        result['current_opened_port']['data'][key]['socket_type'],
+                                        result['current_opened_port']['data'][key]['port'],
+                                        result['current_opened_port']['data'][key]['protocol'],
+                                        result['current_opened_port']['data'][key]['product_name'],
+                                        result['current_opened_port']['data'][key]['product_version'],
+                                        result['current_opened_port']['data'][key]['has_vulnerability']
+                                    )
+                                    portsCount = portsCount + 1
+                                    if portsCount == 10:
+                                        break
+                            else:
+                                if result['current_opened_port']['data'][key]['has_vulnerability'] == True:
+                                    print('\t-',
+                                        result['current_opened_port']['data'][key]['socket_type'],
+                                        result['current_opened_port']['data'][key]['port'],
+                                        result['current_opened_port']['data'][key]['protocol'],
+                                        result['current_opened_port']['data'][key]['product_name'],
+                                        result['current_opened_port']['data'][key]['product_version'],
+                                        result['current_opened_port']['data'][key]['has_vulnerability']
+                                    )
+
                     if result['vulnerability']['count'] != 0:
                         print('[+] Count of vulnerabilities founded:',result['vulnerability']['count'])
                         charToRemove = ["{", "}", "[", "]"]
-                        stringToDisplay = str(result['vulnerability']['data'][key]['ports']).replace("'", '')
+                        vulCount = 0
                         for key in range(len(result['vulnerability']['data'])):
-                            for char in charToRemove:
-                                stringToDisplay = stringToDisplay.replace(char, "")
-                            print('\t-',
-                                result['vulnerability']['data'][key]['cve_id'],
-                                stringToDisplay,
-                                #result['vulnerability']['data'][key][["cvssv2_vector"]],  # TypeError: unhashable type: 'list'
-                                result['vulnerability']['data'][key]['cvssv2_score'],
-                                result['vulnerability']['data'][key]['cvssv3_score'],
-                                result['vulnerability']['data'][key]['product_version'],
-                                result['vulnerability']['data'][key]['product_vendor']
-                            )
+                            stringToDisplay = str(result['vulnerability']['data'][key]['ports']).replace("'", '')
+                            if result['vulnerability']['count'] > 10:
+                                for char in charToRemove:
+                                    stringToDisplay = stringToDisplay.replace(char, "")
+                                print('\t-',
+                                    result['vulnerability']['data'][key]['cve_id'],
+                                    result['vulnerability']['data'][key]['cvssv2_score'],
+                                    result['vulnerability']['data'][key]['cvssv3_score'],
+                                    result['vulnerability']['data'][key]['product_version'],
+                                    result['vulnerability']['data'][key]['product_vendor']
+                                )
+                                vulCount = vulCount + 1
+                                if vulCount == 10:
+                                    break
+                            else:
+                                for key in range(len(result['vulnerability']['data'])):
+                                    for char in charToRemove:
+                                        stringToDisplay = stringToDisplay.replace(char, "")
+                                    print('\t-',
+                                        result['vulnerability']['data'][key]['cve_id'],
+                                        stringToDisplay,
+                                        #result['vulnerability']['data'][key][["cvssv2_vector"]],  # TypeError: unhashable type: 'list'
+                                        result['vulnerability']['data'][key]['cvssv2_score'],
+                                        result['vulnerability']['data'][key]['cvssv3_score'],
+                                        result['vulnerability']['data'][key]['product_version'],
+                                        result['vulnerability']['data'][key]['product_vendor']
+                                    )
+                                vulCount = vulCount + 1
+                                if vulCount != 0:
+                                    break
+
                     if result['ip_category']['count'] != 0:
                         print('[+] count of IP category: ', result['ip_category']['count'])
                         for key in range(len(result['ip_category']['data'])):
@@ -222,6 +260,7 @@ class Functions:
                                 result['ip_category']['data'][key]['type'],'\n\t\t+ detected source =>',
                                 result['ip_category']['data'][key]['detect_source']
                             )
+
                 else:
                     count == count
                     print(DOMAIN_NAME_TO_IP, 'Not found in CriminalIP.io')
@@ -305,28 +344,27 @@ class Functions:
                 response = otx.get_indicator_details_full(IndicatorTypes.IPv4, DOMAIN_NAME_TO_IP)
                 print("[+] Whois link:", response['general']['whois'])
                 print("[+] Reputation:", response['general']['reputation'])
-                #print("indicators: ", response['general']['base_indicator'])
                 print("[+] Count of pulses reported:", response['general']['pulse_info']['count'])
                 OTX_COUNT = response['general']['pulse_info']['count']
                 
                 if response['general']['pulse_info']['count'] != 0:
+                    print("[+] Lasts puples containing tags: ")
+                    tagCount = 0
                     for key in range(len(response['general']['pulse_info']['pulses'])):
-                        whileCount = response['general']['pulse_info']['count']
                         tags = str(response['general']['pulse_info']['pulses'][key]['tags'])
                         charToRemove = ["[", "]", "'"]
                         if response['general']['pulse_info']['pulses'][key]['tags'] != []:
-                            while whileCount <= 25:
-                                for char in charToRemove:
-                                    tags = tags.replace(char, '')
-                                print("[+] 5 lasts puples containing tags: ")
-                                print(
-                                    '\t- Description:', response['general']['pulse_info']['pulses'][key]['description'],
-                                    '\n\t- Last update:', response['general']['pulse_info']['pulses'][key]['modified'],
-                                    '\n\t- Tags:',tags
-                                )
-                                if whileCount == 5:
-                                    break
-                                whileCount = whileCount + 1
+                            for char in charToRemove:
+                                tags = tags.replace(char, '')
+                            print(
+                                '\t- Description:', response['general']['pulse_info']['pulses'][key]['description'],
+                                '\n\t- Last update:', response['general']['pulse_info']['pulses'][key]['modified'],
+                                '\n\t- Tags:',tags,
+                                '\n'
+                            )
+                            if tagCount == 1:
+                                break
+                            tagCount = tagCount + 1
         
         except Exception:
             print('Not found in otx alien vault!')
