@@ -2,16 +2,16 @@
 
 
 > ## **Discovers an IP and/or domain from the following web applications and returns a reputation score.**
-> ### **V1, July 23, tipio, SOC Analyst Intern and Shyan / based on the example of [Sooty](https://github.com/TheresAFewConors/Sooty/blob/master/Sooty.py)**
+> ### **V1, Started in July 23, tipio, SOC Analyst Intern and Shyan / based on the example of [Sooty](https://github.com/TheresAFewConors/Sooty/blob/master/Sooty.py)**
 
 
 ## In run:
-- VirusTotal
-- AbuseIPDB 
+- [VirusTotal](https://www.virustotal.com/gui/home/search)
+- [AbuseIPDB](https://www.abuseipdb.com/)
 - [Duggy Tuxy blacklist](https://github.com/duggytuxy/malicious_ip_addresses)
 - [IPsum](https://github.com/stamparm/ipsum)
-- CriminalIP
-- OTX/AlienVault 
+- [CriminalIP](https://www.criminalip.io/en)
+- [OTX/AlienVault](https://otx.alienvault.com/) 
 
 
 ## Setup

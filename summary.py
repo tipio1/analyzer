@@ -4,41 +4,19 @@ V1, July 23, tipio, SOC Analyst Intern and Shyan / based on the example of Sooty
 Summary function
 """
 
+
 from analyzer import *
 from utils import *
-# import sys
 
 
 class Summary:
     """_summary_
-    Parse functions, calculate note score and returns results
-            print('[!] Agressivity:',agressivity)
-            print('[!] Malicious:',malicious)
-            print('[!] reported:',reported)
-            counts = [ciCount, ciPortCount, ciVulCount, ciCatCount]
-            print(
-                "\t-",vt,
-                "\n\t-",vtTotalScanners,
-                "\n\t-",dt,
-                "\n\t-",ciCount,
-                "\n\t-",ciPortCount,
-                "\n\t-",ciVulCount,
-                "\n\t-",ciCatCount,
-                "\n\t-",abReports,
-                "\n\t-",abCnfidence,
-                "\n\t-",ot
-            )
-            print(
-                "\t-",vtAverage,
-                "\n\t-",agressivity,
-                "\n\t-",malicious,
-                "\n\t-",reported
-            )
+    Calculates scores and returns results
     """
     @staticmethod
     def summary():
         try:
-            countryName = Count.count()[7]
+            # countryName = Count.count()[7]
             country = Count.count()[0][0]
             prx = Count.count()[0][1]
             vt = Count.count()[1][0]
@@ -53,28 +31,21 @@ class Summary:
             abReports = Count.count()[5][0]
             abCnfidence = Count.count()[5][1]
             ot = Count.count()[6]
-            
-            if vt == 0 and vtTotalScanners == 0:
-                vtAverage = 0
-            else:
-                vtAverage = round((vt/vtTotalScanners), 2)
 
             agressivity = 0
             malicious = 0
             reported = 0
 
-            print('[+] Country: ',str(country))
-            print('[+] Country name (returned in French):', countryName)
-            print('[+] Categorized as public proxy (ip2location): ',str(prx))
+            print('[+] Country:',str(country),
+                  '\n[+] Categorized as public proxy (ip2location):',str(prx))
             print("--------------------------------------------------------------------------------------------------------")
             
             if (vt == 0):
                 print('[+] Clean on Virus Total')
             else:
-                print("[!] Detected on Virus Total")
-                print('\t- Count of detections:', vt,
-                      '\n\t- Count of Antivirus scanned:', vtTotalScanners
-                    )
+                print("[!] Detected on Virus Total",
+                      '\n\t- Count of detections:', vt,
+                      '\n\t- Count of Antivirus scanned:', vtTotalScanners)
             print("--------------------------------------------------------------------------------------------------------")
             
             if (dt == 0):  # integrate other blacklists to adjust the result
@@ -115,12 +86,10 @@ class Summary:
             if ciCount == 0:
                 print('[+] Not reporteded by Criminal IP')
             else:
-                print("[!] Reported malicious on Criminal IP")
-                print(
-                      "\t- Count of opened ports:",ciPortCount,
+                print("[!] Reported malicious on Criminal IP",
+                      "\n\t- Count of opened ports:",ciPortCount,
                       "\n\t- Count of vulnerability founded:",ciVulCount,
-                      "\n\t- Count of IP category:",ciCatCount
-                    )
+                      "\n\t- Count of IP category:",ciCatCount)
                 if (ciCount == 1 and agressivity <= 4):
                     malicious = 4
                 if (ciCount == 1 and agressivity > 4 and agressivity <= 6):
@@ -135,9 +104,8 @@ class Summary:
             if abReports == 0:  # integrate otx to adjust the result
                 print("[+] Not found on AbuseIPDB")
             else:
-                print("[!] Reported on AbuseIPDB")
-                print(
-                    "\t- Confidence index:",abCnfidence, '%',
+                print("[!] Reported on AbuseIPDB",
+                    "\n\t- Confidence index:",abCnfidence, '%',
                     "\n\t- Count of reports:",abReports)
                 if (abReports <= 50 and agressivity < 4 and malicious <= 4):
                     reported = 4

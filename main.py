@@ -20,8 +20,8 @@ if __name__ == '__main__':
         print(Color.BLUE + "[+] Create a directory to store reports" + Color.END)
         print("--------------------------------------------------------------------------------------------------------")
         Directory.getReportDierectory()
-        print("[+] Directory create in: " + os.getcwd())
-        print("[+] IP associated with the domain: " + DOMAIN_NAME_TO_IP)
+        print("[+] Directory create, report link is stored in: " + os.getcwd()) + '/analyzer_reports'
+        print("[+] IP associated with the INPUT: " + DOMAIN_NAME_TO_IP)
         
         print(Color.BLUE + "[+] Check Whois.io" + Color.END)
         print("--------------------------------------------------------------------------------------------------------")
@@ -60,5 +60,7 @@ if __name__ == '__main__':
         Summary.summary()
         print("--------------------------------------------------------------------------------------------------------")
     
+    except Exception as err:
+        print(Color.RED + 'error: ' + err + Color.END)
     except KeyboardInterrupt:
         print(Color.ORANGE + '[!] bye' + Color.END)
