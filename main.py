@@ -20,7 +20,7 @@ if __name__ == '__main__':
         print(Color.BLUE + "[+] Create a directory to store reports" + Color.END)
         print("--------------------------------------------------------------------------------------------------------")
         Directory.getReportDierectory()
-        print("[+] Directory create, report link is stored in: " + os.getcwd()) + '/analyzer_reports'
+        print("[+] Directory create, report link is stored in: " + str(os.getcwd()) + '/analyzer_reports')
         print("[+] IP associated with the INPUT: " + DOMAIN_NAME_TO_IP)
         
         print(Color.BLUE + "[+] Check Whois.io" + Color.END)
@@ -51,9 +51,9 @@ if __name__ == '__main__':
         print("--------------------------------------------------------------------------------------------------------")
         Functions.otx()
         
-        #print(Color.BLUE + "[+] Check other (coming soon)" + Color.END)
-        #print("--------------------------------------------------------------------------------------------------------")
-        #Functions.othersScans()
+        print(Color.BLUE + "[+] GCI report" + Color.END)
+        print("--------------------------------------------------------------------------------------------------------")
+        Country.gci()
         
         print(Color.GREEN + "[+] Report stored, here is the summary: " + Color.END)
         print("--------------------------------------------------------------------------------------------------------")
@@ -61,6 +61,6 @@ if __name__ == '__main__':
         print("--------------------------------------------------------------------------------------------------------")
     
     except Exception as err:
-        print(Color.RED + 'error: ' + err + Color.END)
+        print(err)
     except KeyboardInterrupt:
         print(Color.ORANGE + '[!] bye' + Color.END)

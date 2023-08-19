@@ -12,6 +12,8 @@ from OTXv2 import OTXv2
 from OTXv2 import IndicatorTypes
 from bs4 import BeautifulSoup as bs
 import urllib.request
+import PyPDF2
+from os.path import exists
 from utils import *
 
 
@@ -444,30 +446,27 @@ class Functions:
             print(Color.RED + "[!] Error with OTX:" + err + Color.END)
 
 
-
     @staticmethod
     def othersScans():
         print('')
         # https://threatbook.io/
-        # https://www.itu.int/epublications/publication/D-STR-GCI.01-2021-HTM-E
 
 
 class Country:
     @staticmethod
-    def country():
-        global COUNTRY_NAME
-        url = ('https://www.atlas-monde.net/codes-iso/')
-        response = requests.get(url)
-        soup = bs(response.text, 'html.parser')
-        page = soup.find_all('td')
-        countryNames = list()
-        for countryName in page:
-            countryNames.append(countryName.text)
-        target = WHOIS[0]
-        if target in countryNames:
-            index = countryNames.index(target)
-        
-        COUNTRY_NAME = countryNames[index-1]
+    def gci():
+        """_summary_
+            The Global Cybersecurity Index (GCI): trusted reference that measures the commitment of countries to cybersecurity at a global level
+        """
+        print(Color.GREEN + "[+] Global Cybersecurity Index (GCI) report: a reliable benchmark measuring countries' commitment to cybersecurity worldwide" + Color.END)
+        print('[+] Published in Geneva, Switerland 2023',
+              '\n[+] Legend (Country name - Note - Rank):',
+              '\n\t- * no data collected',
+              '\n\t- ** no response to the questionnaire',
+              '\n')
+
+        country = WHOIS[0]
+        os.system(f"cat cgi.txt | grep '{country}'")
 
 
 class Count:
@@ -476,5 +475,4 @@ class Count:
     """
     @staticmethod
     def count():
-        # Country.country()
-        return [WHOIS, VT_COUNT, DUGGY_COUNT, IPSUM_COUNT,CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]  #, COUNTRY_NAME]
+        return [WHOIS, VT_COUNT, DUGGY_COUNT, IPSUM_COUNT,CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]

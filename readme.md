@@ -11,7 +11,8 @@
 - [Duggy Tuxy blacklist](https://github.com/duggytuxy/malicious_ip_addresses)
 - [IPsum](https://github.com/stamparm/ipsum)
 - [CriminalIP](https://www.criminalip.io/en)
-- [OTX/AlienVault](https://otx.alienvault.com/) 
+- [OTX/AlienVault](https://otx.alienvault.com/)
+- [Global Cybersecurity Index (GCI)](https://www.itu.int/epublications/publication/D-STR-GCI.01-2021-HTM-E)
 
 
 ## Setup
