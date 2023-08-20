@@ -53,6 +53,7 @@ if __name__ == '__main__':
         
         print(Color.BLUE + "[+] GCI report" + Color.END)
         print("--------------------------------------------------------------------------------------------------------")
+        Cleaning.gciClean()
         Country.gci()
         
         print(Color.GREEN + "[+] Report stored, here is the summary: " + Color.END)

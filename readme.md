@@ -54,6 +54,7 @@ source .zshrc
 
 ### Run analyzer:
 ```bash
+cd $HOME/Documents
 analyzer
 Enter IP Address or Domain name: 
 ```

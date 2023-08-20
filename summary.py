@@ -16,8 +16,8 @@ class Summary:
     @staticmethod
     def summary():
         try:
-            # gciNote = Count.count()[7][0]
-            # gciRank = Count.count()[7][1]
+            gciNote = Count.count()[7][0]
+            gciRank = Count.count()[7][1]
             country = Count.count()[0][0]
             prx = Count.count()[0][1]
             vt = Count.count()[1][0]
@@ -38,9 +38,9 @@ class Summary:
             reported = 0
 
             print('[+] Country:',str(country),
-                  '\n[+] Categorized as public proxy (ip2location):',str(prx))
-                #   '\n[+] Country rank:', gciNote,
-                #   '\n[+] GCI report note:', gciRank)
+                  '\n[+] Categorized as public proxy (ip2location):',str(prx),
+                  '\n[+] Country rank:', gciRank,
+                  '\n[+] GCI report note:', gciNote)
             print("--------------------------------------------------------------------------------------------------------")
             
             if (vt == 0):

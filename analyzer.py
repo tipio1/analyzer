@@ -12,8 +12,6 @@ from OTXv2 import OTXv2
 from OTXv2 import IndicatorTypes
 from bs4 import BeautifulSoup as bs
 import urllib.request
-import PyPDF2
-from os.path import exists
 from utils import *
 
 
@@ -458,15 +456,80 @@ class Country:
         """_summary_
             The Global Cybersecurity Index (GCI): trusted reference that measures the commitment of countries to cybersecurity at a global level
         """
-        print(Color.GREEN + "[+] Global Cybersecurity Index (GCI) report: a reliable benchmark measuring countries' commitment to cybersecurity worldwide" + Color.END)
-        print('[+] Published in Geneva, Switerland 2023',
-              '\n[+] Legend (Country name - Note - Rank):',
-              '\n\t- * no data collected',
-              '\n\t- ** no response to the questionnaire',
-              '\n')
+        # Must be corrected
+        try:
+            global GCI_COUNT
+            print(Color.GREEN + "[+] Global Cybersecurity Index (GCI) report: a reliable benchmark measuring countries' commitment to cybersecurity worldwide" + Color.END)
+            print('[+] Published in Geneva, Switerland 2023',
+                '\n[+] Legend [Country name - Note - Rank]:',
+                '\n\t- * no data collected',
+                '\n\t- ** no response to the questionnaire',
+                "\nIf no results, country not included in GCI 2023 report.")
 
-        country = WHOIS[0]
-        os.system(f"cat cgi.txt | grep '{country}'")
+            country = WHOIS[0]
+            note = 0
+            rank = 0
+            char = " "
+            error = "("
+            print(country)  # regex to cut "country" if it's a compound string
+
+            os.system(f"echo '{country}' > analyzer_reports/countryName.txt")
+            os.system(f"cat analyzer_reports/countryName.txt | grep '{country}' | awk '{{print $1}}' > analyzer_reports/countryName2.txt")
+            with open('analyzer_reports/countryName2.txt', 'r') as countryN:
+                text = countryN.read()
+                char = text
+                countryN.close()
+                os.system("rm -rf analyzer_reports/countryName.txt analyzer_reports/countryName2.txt")
+                
+            os.system(f"cat analyzer_reports/gci.txt | grep {char}")
+
+            if error in country:
+                print('[+] Not reported in CGI report')
+                print(Color.ORANGE + "[!] Check 'country' spelling" + Color.END)
+                GCI_COUNT = [note, rank]
+                pass
+
+            elif char in country:
+                os.system(f"cat analyzer_reports/gci.txt | grep '{country}' | sed -e 's/[A-Z]/ /g' -e 's/[a-z]/ /g' -e 's/**//g' -e 's/^\ *//g' | awk '{{print $1}}' > analyzer_reports/countryNote.txt")
+                os.system(f"cat analyzer_reports/gci.txt | grep '{country}' | sed -e 's/[A-Z]/ /g' -e 's/[a-z]/ /g' -e 's/**//g' -e 's/^\ *//g' | awk '{{print $2}}' > analyzer_reports/countryRank.txt")
+            else:
+                os.system(f"cat gci.txt | grep {country} | awk '{{print $2}}' > analyzer_reports/countryNote.txt")
+                os.system(f"cat gci.txt | grep {country} | awk '{{print $3}}' | sed -e 's/[A-Z]\ */ /g' -e 's/[a-z]\ */ /g' | cut -f 1 > analyzer_reports/countryRank.txt")
+
+            with open('analyzer_reports/countryRank.txt', 'r') as countryRank:
+                rank = countryRank.read()
+                if int(rank) != 0:
+                    print(f'[!] GCI rank:', int(rank))
+                    countryRank.close()
+                    os.system('rm -rf analyzer_reports/countryRank.txt')
+
+            with open('analyzer_reports/countryNote.txt', 'r') as countryNote:
+                note = countryNote.read()
+                if float(note) != 0 or float(note) == 0:
+                    print(f'[!] GCI note:', float(note))
+                    countryNote.close()
+                    os.system('rm -rf analyzer_reports/countryNote.txt')
+
+            GCI_COUNT = [float(note), int(rank)]
+
+        except Exception as err:
+            print(err)
+        
+        try:
+            with open('analyzer_reports/'+TODAY+'/'+str(DOMAIN_NAME_TO_IP) + ".txt","a+") as fileReport:
+                fileReport.write("\n ------------------------------------------------------------------ ")
+                fileReport.write("\n GCI report: ")
+                fileReport.write("\n --------------------------------- \n")
+                if int(rank) != 0:
+                    fileReport.write('[!] GCI rank: ')
+                    fileReport.write(rank)
+                    fileReport.write('[!] GCI note:')
+                    fileReport.write(note)
+                    fileReport.close()
+                else:
+                    fileReport.write('[!] Not reported in GCI 2023')
+        except Exception as err:
+            print(err)
 
 
 class Count:
@@ -475,4 +538,4 @@ class Count:
     """
     @staticmethod
     def count():
-        return [WHOIS, VT_COUNT, DUGGY_COUNT, IPSUM_COUNT,CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT]
+        return [WHOIS, VT_COUNT, DUGGY_COUNT, IPSUM_COUNT,CRIMINALIP_COUNTS, ABUSEIPDB_CONFIDENCE, OTX_COUNT, GCI_COUNT]
