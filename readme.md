@@ -2,7 +2,7 @@
 
 
 > ## **Discovers an IP and/or domain from the following web applications and returns a reputation score.**
-> ### **V1, Started in July 23, tipio, SOC Analyst Intern and Shyan / based on the example of [Sooty](https://github.com/TheresAFewConors/Sooty/blob/master/Sooty.py)**
+> #### **V1, Started in July 23, tipio, SOC Analyst Intern and Shyan / based on the example of [Sooty](https://github.com/TheresAFewConors/Sooty/blob/master/Sooty.py)**
 
 
 ## In run:
@@ -56,7 +56,9 @@ source .zshrc
 ```bash
 cd $HOME/Documents
 analyzer
-Enter IP Address or Domain name: 
 ```
 
 ## Coming soon:
+- [Threat book](https://threatbook.io/): provides high-fidelity intelligence collected from alerts from real customer cases.
+- Integrate the "Red flag" report. To do this: match the domains in the list with their IP address.
+    - [Red flag](https://red.flag.domains/): lists of very recently registered probably malicious domain names in french TLDs 

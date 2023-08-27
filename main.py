@@ -38,7 +38,7 @@ if __name__ == '__main__':
         print(Color.BLUE + "[+] Check IPsum's blacklists" + Color.END)
         print("--------------------------------------------------------------------------------------------------------")
         Functions.ipsum()
-        
+
         print(Color.BLUE + "[+] Check CriminalIP.io" + Color.END)
         print("--------------------------------------------------------------------------------------------------------")
         Functions.criminalIP()
@@ -55,6 +55,10 @@ if __name__ == '__main__':
         print("--------------------------------------------------------------------------------------------------------")
         Cleaning.gciClean()
         Country.gci()
+
+        # print(Color.BLUE + "[+] Check Red flag's list" + Color.END)
+        # print("--------------------------------------------------------------------------------------------------------")
+        # Functions.threatBook()
         
         print(Color.GREEN + "[+] Report stored, here is the summary: " + Color.END)
         print("--------------------------------------------------------------------------------------------------------")

@@ -445,7 +445,10 @@ class Functions:
 
 
     @staticmethod
-    def othersScans():
+    def threatBook():
+        """_summary_
+        Provides high-fidelity intelligence collected from alerts from real customer cases.
+        """
         print('')
         # https://threatbook.io/
 
