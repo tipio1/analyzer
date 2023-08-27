@@ -456,7 +456,6 @@ class Country:
         """_summary_
             The Global Cybersecurity Index (GCI): trusted reference that measures the commitment of countries to cybersecurity at a global level
         """
-        # Must be corrected
         try:
             global GCI_COUNT
             print(Color.GREEN + "[+] Global Cybersecurity Index (GCI) report: a reliable benchmark measuring countries' commitment to cybersecurity worldwide" + Color.END)
@@ -469,9 +468,6 @@ class Country:
             country = WHOIS[0]
             note = 0
             rank = 0
-            char = " "
-            error = "("
-            print(country)  # regex to cut "country" if it's a compound string
 
             os.system(f"echo '{country}' > analyzer_reports/countryName.txt")
             os.system(f"cat analyzer_reports/countryName.txt | grep '{country}' | awk '{{print $1}}' > analyzer_reports/countryName2.txt")
@@ -480,21 +476,33 @@ class Country:
                 char = text
                 countryN.close()
                 os.system("rm -rf analyzer_reports/countryName.txt analyzer_reports/countryName2.txt")
-                
+
             os.system(f"cat analyzer_reports/gci.txt | grep {char}")
 
-            if error in country:
-                print('[+] Not reported in CGI report')
-                print(Color.ORANGE + "[!] Check 'country' spelling" + Color.END)
-                GCI_COUNT = [note, rank]
-                pass
+            char = " "
+            parentheses = "("
+            if parentheses in country:
+                charToRemove = ["(", ")"]
+                for x in charToRemove:
+                    country = country.replace(x, '')
+                    # space = country.count(" ")
+                    start = 0
+                    end = country.index(" ")
+                    # stringOfCountry = []
+                country = country[start:end]
+                os.system(f"cat analyzer_reports/gci.txt | grep {country} | awk '{{print $2}}' > analyzer_reports/countryNote.txt")
+                os.system(f"cat analyzer_reports/gci.txt | grep {country} | awk '{{print $3}}' | sed -e 's/[A-Z]\ */ /g' -e 's/[a-z]\ */ /g' | cut -f 1 > analyzer_reports/countryRank.txt")
+                if country == 'Taiwan':
+                    print('[!] Not reported in GCI report')
+                    os.system("echo 0 > analyzer_reports/countryNote.txt")
+                    os.system("echo 999 > analyzer_reports/countryRank.txt")
 
             elif char in country:
                 os.system(f"cat analyzer_reports/gci.txt | grep '{country}' | sed -e 's/[A-Z]/ /g' -e 's/[a-z]/ /g' -e 's/**//g' -e 's/^\ *//g' | awk '{{print $1}}' > analyzer_reports/countryNote.txt")
                 os.system(f"cat analyzer_reports/gci.txt | grep '{country}' | sed -e 's/[A-Z]/ /g' -e 's/[a-z]/ /g' -e 's/**//g' -e 's/^\ *//g' | awk '{{print $2}}' > analyzer_reports/countryRank.txt")
             else:
-                os.system(f"cat gci.txt | grep {country} | awk '{{print $2}}' > analyzer_reports/countryNote.txt")
-                os.system(f"cat gci.txt | grep {country} | awk '{{print $3}}' | sed -e 's/[A-Z]\ */ /g' -e 's/[a-z]\ */ /g' | cut -f 1 > analyzer_reports/countryRank.txt")
+                os.system(f"cat analyzer_reports/gci.txt | grep {country} | awk '{{print $2}}' > analyzer_reports/countryNote.txt")
+                os.system(f"cat analyzer_reports/gci.txt | grep {country} | awk '{{print $3}}' | sed -e 's/[A-Z]\ */ /g' -e 's/[a-z]\ */ /g' | cut -f 1 > analyzer_reports/countryRank.txt")
 
             with open('analyzer_reports/countryRank.txt', 'r') as countryRank:
                 rank = countryRank.read()

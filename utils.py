@@ -106,14 +106,26 @@ class Cleaning:
                 us = ['United States of', 'America**100 1']
                 for char in us:
                     pages = pages.replace(char, 'United States of America** 100 1')
+
+                korea = ['Korea (Rep. of)']
+                for char in korea:
+                    pages = pages.replace(char, 'SouthKorea')
             
                 iran = ['Iran (Islamic Republic','of)81.07 54']
                 for char in iran:
-                    pages = pages.replace(char, 'Iran (Islamic Republic of) 81.07 54')
+                    pages = pages.replace(char, 'Iran 81.07 54')
+                
+                nepal = ['Nepal (Republic of)']
+                for char in nepal:
+                    pages = pages.replace(char, 'Nepal')
 
                 bolivia = ['Bolivia (Plurinational','State of)16.14 140']
                 for char in bolivia:
-                    pages = pages.replace(char, 'Bolivia (Plurinational State of) 16.14 140')
+                    pages = pages.replace(char, 'Bolivia 16.14 140')
+                
+                congo = ['Congo (Rep. of the)**']
+                for char in congo:
+                    pages = pages.replace(char, 'CongoRep**')
 
                 grenadines = ['Grenadines**12.18 154']
                 for char in grenadines:
@@ -121,7 +133,7 @@ class Cleaning:
 
                 korea = ["Dem. People's Rep. of", 'Korea**1.35 181']
                 for char in korea:
-                    pages = pages.replace(char, "Dem. People's Rep. of Korea** 1.35 181")
+                    pages = pages.replace(char, "NorthKorea** 1.35 181")
 
             with open('analyzer_reports/gci.txt', 'w') as text:
                 text.write(pages)
