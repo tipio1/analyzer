@@ -6,6 +6,7 @@
 
 
 ## In run:
+- [ip2location](https://www.ip2location.io/)
 - [VirusTotal](https://www.virustotal.com/gui/home/search)
 - [AbuseIPDB](https://www.abuseipdb.com/)
 - [Duggy Tuxy blacklist](https://github.com/duggytuxy/malicious_ip_addresses)
@@ -17,16 +18,16 @@
 
 ## Setup
 ### Requirements:
-- OTXv2:
+- OTXv2 and PyPDF2:
 ```bash
-cd ../analyzer
+cd 
 pip --version  # need pip3
-pip install OTXv2
-# If not accessible after common installation via pip 
+pip3 install OTXv2 && pip3 install PyPDF2
+# If not accessible after common installation via pip3
 # try:
-pip3 install OTXv2
+sudo pip install OTXv2 && sudo pip install PyPDF2
 # or
-sudo pip install OTXv2
+pip install OTXv2 && pip install PyPDF2
 ```
 
 ### Adjust utils.py:
@@ -37,6 +38,7 @@ sudo pip install OTXv2
 ```json
 {
     "api": {
+        "ip2location": "your API key",
         "virus total": "your API key", 
         "abuseipdb": "your API key",
         "criminal ip": "your API key",
@@ -48,7 +50,7 @@ sudo pip install OTXv2
 ### Create an alias:
 - edit your `.bashrc` or `.zshrc`
 ```bash
-alias analyzer='path of main.py directory'
+alias analyzer='python3 <path of main.py directory>'
 source .zshrc
 ```
 
